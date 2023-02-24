@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 // const myTalkers = require('./talker.json');
+const crypto = require('crypto');
 
 const talkersPath = path.resolve(__dirname, './talker.json');
 
@@ -16,6 +17,14 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
+app.listen(PORT, () => {
+  console.log('Online');
+});
+
+function generateToken() {
+  return crypto.randomBytes(8).toString('hex');
+}
+
 const readTalkers = async () => {
   try {
     const talkersJson = await fs.readFile(talkersPath);
@@ -26,10 +35,6 @@ const readTalkers = async () => {
     console.error('Erro');
   }
 };
-
-app.listen(PORT, () => {
-  console.log('Online');
-});
 
 app.get('/talker', async (_req, res) => {
   const talkers = await readTalkers();
@@ -47,6 +52,11 @@ app.get('/talker/:id', async (req, res) => {
     return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
   }
   res.status(200).json(talkersById);
+});
+
+app.post('/login', async (_req, res) => {
+  const token = generateToken();  
+  return res.status(HTTP_OK_STATUS).json({ token }); 
 });
 
 function main() {
