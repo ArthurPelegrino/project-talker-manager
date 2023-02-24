@@ -3,6 +3,7 @@ const fs = require('fs').promises;
 const path = require('path');
 // const myTalkers = require('./talker.json');
 const crypto = require('crypto');
+const validationLogin = require('./middleware/validationLogin');
 
 const talkersPath = path.resolve(__dirname, './talker.json');
 
@@ -54,7 +55,7 @@ app.get('/talker/:id', async (req, res) => {
   res.status(200).json(talkersById);
 });
 
-app.post('/login', async (_req, res) => {
+app.post('/login', validationLogin, async (_req, res) => {
   const token = generateToken();  
   return res.status(HTTP_OK_STATUS).json({ token }); 
 });
