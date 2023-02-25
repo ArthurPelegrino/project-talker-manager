@@ -1,15 +1,11 @@
-function validateEmail(param) {
-    const validEmail = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$/i;
-    const validationEmail = validEmail.test(param);
-    return validationEmail;
-}
-
-function validationLogin(req, res) {
+function validationLogin(req, res, next) {
     const { email, password } = req.body;
-    const validEmail = validateEmail(email);
-
+    // const isValid = requiredProperies.every((e) => e in req.body);
     if (!email) {
-        return res.status(400).json({ message: 'O campo "email" é obrigatório' });
+    return res.status(400).json({ message: 'O campo "email" é obrigatório' });
+    }
+    if (!(email.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/))) {
+    return res.status(400).json({ message: 'O "email" deve ter o formato "email@email.com"' });
     }
     if (!password) {
         return res.status(400).json({ message: 'O campo "password" é obrigatório' });
@@ -17,11 +13,7 @@ function validationLogin(req, res) {
     if (password.length < 6) {
         return res.status(400).json({ message: 'O "password" deve ter pelo menos 6 caracteres' });
     }
-    if (!validEmail) {
-        return res.status(400).json(
-            { message: 'O "email" deve ter o formato "email@email.com"' },
-);
+        next();
     }
-}
 
 module.exports = validationLogin;

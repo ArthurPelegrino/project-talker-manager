@@ -55,9 +55,9 @@ app.get('/talker/:id', async (req, res) => {
   res.status(200).json(talkersById);
 });
 
-app.post('/login', validationLogin, async (_req, res) => {
+app.post('/login', validationLogin, async (req, res) => {
   const token = generateToken();  
-  return res.status(HTTP_OK_STATUS).json({ token }); 
+  res.status(HTTP_OK_STATUS).json({ token }); 
 });
 
 function main() {
