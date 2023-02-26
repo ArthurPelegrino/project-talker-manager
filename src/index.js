@@ -4,6 +4,10 @@ const path = require('path');
 // const myTalkers = require('./talker.json');
 const crypto = require('crypto');
 const validationLogin = require('./middleware/validationLogin');
+const { validateAge, validateName, validateRate,
+validateTalk,
+ validateToken,
+  validateWatchedAt } = require('./middleware/validadeTalker');
 
 const talkersPath = path.resolve(__dirname, './talker.json');
 
@@ -37,6 +41,16 @@ const readTalkers = async () => {
   }
 };
 
+async function writeTalker(newTalker) {
+  try {
+    const refreshedTalkers = await readTalkers();
+    refreshedTalkers.push(newTalker);
+    await fs.writeFile(talkersPath, JSON.stringify(refreshedTalkers));
+  } catch (error) {
+    console.error('error: ', error.message);
+  }
+} 
+
 app.get('/talker', async (_req, res) => {
   const talkers = await readTalkers();
   const errorCase = [];
@@ -60,8 +74,30 @@ app.post('/login', validationLogin, async (req, res) => {
   res.status(HTTP_OK_STATUS).json({ token }); 
 });
 
+app.post('/talker',
+validateToken, 
+validateName, validateAge, validateTalk, validateWatchedAt,
+validateRate,
+ async (req, res) => {
+  const { name, age } = req.body;
+  const { watchedAt, rate } = req.body.talk;
+    const myTalkers = await readTalkers();
+  const newTalker = {
+    id: myTalkers[myTalkers.length - 1].id + 1,
+    name,
+    age,
+    talk: {
+      rate,
+      watchedAt,
+    },
+  };
+  await writeTalker(newTalker);
+
+  return res.status(201).json(newTalker);
+});
+
 function main() {
-  readTalkers();
+  // readTalkers();
 }
 
 main();
