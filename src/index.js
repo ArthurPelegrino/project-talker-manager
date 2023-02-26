@@ -49,7 +49,7 @@ async function writeTalker(newTalker) {
   } catch (error) {
     console.error('error: ', error.message);
   }
-} 
+}
 
 app.get('/talker', async (_req, res) => {
   const talkers = await readTalkers();
@@ -95,6 +95,19 @@ validateRate,
 
   return res.status(201).json(newTalker);
 });
+
+app.put('/talker/:id', validateToken, validateName,
+validateAge, validateTalk, validateWatchedAt, validateRate,
+ async (req, res) => {
+  const id = Number(req.params.id);
+  const talkers = await readTalkers();
+  const talkerToEdit = talkers.find((element) => element.id === id);
+  const index = talkers.indexOf(talkerToEdit);
+  const updated = { id, ...req.body };
+  talkers.splice(index, 1, updated);
+  await writeTalker(updated);
+  return res.status(200).json(updated);
+ });
 
 function main() {
   // readTalkers();
