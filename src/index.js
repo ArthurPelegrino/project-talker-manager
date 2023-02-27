@@ -3,6 +3,8 @@ const fs = require('fs').promises;
 const path = require('path');
 // const myTalkers = require('./talker.json');
 const crypto = require('crypto');
+// const { write } = require('fs');
+const { writeFile } = require('fs');
 const validationLogin = require('./middleware/validationLogin');
 const { validateAge, validateName, validateRate,
 validateTalk,
@@ -50,6 +52,12 @@ async function writeTalker(newTalker) {
     console.error('error: ', error.message);
   }
 }
+
+// async function deleteTalker(deletedTalker) {
+//   try {
+    
+//   }
+// }
 
 app.get('/talker', async (_req, res) => {
   const talkers = await readTalkers();
@@ -107,6 +115,14 @@ validateAge, validateTalk, validateWatchedAt, validateRate,
   talkers.splice(index, 1, updated);
   await writeTalker(updated);
   return res.status(200).json(updated);
+ });
+
+ app.delete('/talker/:id', validateToken, async (req, res) => {
+  const id = Number(req.params.id);
+  const talkers = await readTalkers();
+  const updated = await talkers.filter((talker) => talker.id !== id);
+  await fs.writeFile(talkersPath, JSON.stringify(updated));
+  return res.status(204).json();
  });
 
 function main() {
