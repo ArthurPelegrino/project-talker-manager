@@ -4,7 +4,6 @@ const path = require('path');
 // const myTalkers = require('./talker.json');
 const crypto = require('crypto');
 // const { write } = require('fs');
-const { writeFile } = require('fs');
 const validationLogin = require('./middleware/validationLogin');
 const { validateAge, validateName, validateRate,
 validateTalk,
@@ -54,10 +53,23 @@ async function writeTalker(newTalker) {
 }
 
 // async function deleteTalker(deletedTalker) {
-//   try {
+  //   try {
     
-//   }
-// }
+    //   }
+    // }
+    
+app.get('/talker/search', validateToken, async (req, res) => {
+     const searchTerm = req.query.q;
+     const talkers = await readTalkers();
+     const searchReturn = talkers.filter((talker) => talker.name.includes(searchTerm));
+     if (searchTerm.length === 0) {
+      return res.status(200).json(talkers);
+     }
+     if (searchReturn.length === 0) {
+      return res.status(200).json([]);
+     }
+     return res.status(200).json(searchReturn);
+    });
 
 app.get('/talker', async (_req, res) => {
   const talkers = await readTalkers();
